@@ -1,0 +1,123 @@
+\documentclass{beamer}
+%\usetheme{PaloAlto}
+\usetheme{Boadilla}
+\usecolortheme{crane}
+%\mode<presentation>
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+
+\usepackage{graphicx}
+\usepackage{caption}
+%\usepackage{subcaption}
+
+\usepackage{pifont} % symboly \ding{}
+
+
+\makeatletter
+\def\Ldescription{%
+  \@ifnextchar[{\beamer@testforospec}{\beamer@descdefault\beamer@descriptionwidth\@@Ldescription}%
+}
+
+\def\beamer@testforospec[{\@ifnextchar<{\beamer@scandefaultospec[}{\@Ldescription[}}%
+
+\def\beamer@scandefaultospec[#1]{\def\beamer@defaultospec{#1}\Ldescription}
+
+\def\@Ldescription[#1]{%
+\setbox\beamer@tempbox=\hbox{\def\insertdescriptionitem{#1}
+  \usebeamertemplate**{description item}}%
+\beamer@descdefault\wd\beamer@tempbox\@@description%
+}%
+
+\def\@@Ldescription{%
+  \beamer@descdefault35pt%
+  \list
+  {}
+  {\labelwidth\beamer@descdefault\leftmargin2.8em\let\makelabel\beamer@Ldescriptionitem}%
+  \beamer@cramped%
+  \raggedright
+  \beamer@firstlineitemizeunskip%
+}
+
+\def\endLdescription{\ifhmode\unskip\fi\endlist}
+\long\def\beamer@Ldescriptionitem#1{%
+  \def\insertdescriptionitem{#1}%
+  \hspace\labelsep{\parbox[b]{\dimexpr\textwidth-\labelsep\relax}{%
+        \usebeamertemplate**{description item}%
+    }}}
+\makeatother
+
+%==============================================================================
+
+
+
+\title[Dokumentace protokolu Speedtest]{Dokumentace protokolu Speedtest}
+\subtitle[Prezentace přístupu k řešení]{Prezentace přístupu k řešení}
+\author[Bc. Karel Fiala]{Bc. Karel Fiala}
+\institute[ČVUT FIT]{
+   Fakulta informačních technologií \\
+   České vysoké učení technické v~Praze
+ }
+\date{\today}
+
+
+\begin{document}
+
+\begin{frame}
+   \titlepage
+\end{frame}
+
+
+%\begin{frame}{Obsah prezentace}
+%   \tableofcontents
+%\end{frame}
+
+
+%\section{Úvodem}\label{sec:uvod}
+\section{Zadání}
+\begin{frame}{Zadání}
+Na základě zachyceného provozu pro výkonnostní test sítě programu Speedtest pro různě rychlá připojení od mobilního po 10 Gbps analyzujte a podrobně zdokumentujte použitý protokol, časový profil a objem testovacích dat v závislosti na naměřené propustnosti a vysvětlete případné anomálie.
+
+\bigskip
+
+\hfill \textbf{$\rightarrow$ analyzujte a zdokumentujte} \hfill \hfill
+
+\end{frame}
+
+
+\begin{frame}{Přístup k řešení}
+\begin{enumerate}
+\item Wireshark
+\bigskip
+\item speedtest-cli
+\bigskip
+\item Jak to funguje\\ $\rightarrow$ fork, detailní výpisy + Wireshark
+\bigskip
+\item Provést mnoho měření (až do 10 Gbps?)\\ $\rightarrow$ skript, logovat, uměle omezovat rychlost
+\bigskip
+\item Zjistit závislosti, vynést grafy, napsat dokumentaci
+\end{enumerate}
+
+\end{frame}
+
+
+%\section{Závěr}\label{sec:zaver}
+%\subsection{Shrnutí}\label{sec:zaver1}
+%\subsection{Literatura}\label{sec:zaver2}
+%\subsection{Poděkování}\label{sec:zaver3}
+%\subsection{Otázky}\label{sec:zaver4}
+
+
+
+
+%\begin{frame}{obr}
+ %   \begin{figure}[h!]
+%	    \centering
+%	    \includegraphics[width=0.9\textwidth]{nic.jpg}
+%	    \caption{obr}
+%	    \label{obr:obr}
+ %   \end{figure}
+%\end{frame}
+
+
+\end{document}
