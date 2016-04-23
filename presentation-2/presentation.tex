@@ -1,0 +1,184 @@
+\documentclass{beamer}
+%\usetheme{PaloAlto}
+\usetheme{Boadilla}
+\usecolortheme{crane}
+%\mode<presentation>
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+
+\usepackage{graphicx}
+\usepackage{caption}
+%\usepackage{subcaption}
+\usepackage{verbatim}
+
+\usepackage{pifont} % symboly \ding{}
+
+
+\makeatletter
+\def\Ldescription{%
+  \@ifnextchar[{\beamer@testforospec}{\beamer@descdefault\beamer@descriptionwidth\@@Ldescription}%
+}
+
+\def\beamer@testforospec[{\@ifnextchar<{\beamer@scandefaultospec[}{\@Ldescription[}}%
+
+\def\beamer@scandefaultospec[#1]{\def\beamer@defaultospec{#1}\Ldescription}
+
+\def\@Ldescription[#1]{%
+\setbox\beamer@tempbox=\hbox{\def\insertdescriptionitem{#1}
+  \usebeamertemplate**{description item}}%
+\beamer@descdefault\wd\beamer@tempbox\@@description%
+}%
+
+\def\@@Ldescription{%
+  \beamer@descdefault35pt%
+  \list
+  {}
+  {\labelwidth\beamer@descdefault\leftmargin2.8em\let\makelabel\beamer@Ldescriptionitem}%
+  \beamer@cramped%
+  \raggedright
+  \beamer@firstlineitemizeunskip%
+}
+
+\def\endLdescription{\ifhmode\unskip\fi\endlist}
+\long\def\beamer@Ldescriptionitem#1{%
+  \def\insertdescriptionitem{#1}%
+  \hspace\labelsep{\parbox[b]{\dimexpr\textwidth-\labelsep\relax}{%
+        \usebeamertemplate**{description item}%
+    }}}
+\makeatother
+
+%==============================================================================
+
+
+
+\title[Dokumentace protokolu Speedtest]{Dokumentace protokolu Speedtest}
+\subtitle[Prezentace stavu řešení]{Prezentace stavu řešení}
+\author[Bc. Karel Fiala]{Bc. Karel Fiala}
+\institute[ČVUT FIT]{
+   Fakulta informačních technologií \\
+   České vysoké učení technické v~Praze
+ }
+\date{\today}
+
+
+\begin{document}
+
+\begin{frame}
+   \titlepage
+\end{frame}
+
+
+%\begin{frame}{Obsah prezentace}
+%   \tableofcontents
+%\end{frame}
+
+
+%\section{Úvodem}\label{sec:uvod}
+\section{Zadání}
+\begin{frame}{Zadání}
+Na základě zachyceného provozu pro výkonnostní test sítě programu Speedtest pro různě rychlá připojení od mobilního po 10 Gbps analyzujte a podrobně zdokumentujte použitý protokol, časový profil a objem testovacích dat v závislosti na naměřené propustnosti a vysvětlete případné anomálie.
+
+\bigskip
+
+\hfill \textbf{$\rightarrow$ analyzujte a zdokumentujte} \hfill \hfill 
+
+\end{frame}
+
+
+\begin{frame}{Stav řešení 1/2}
+\begin{itemize}
+\item \url{https://github.com/fialakarel/speedtest-cli/tree/mi-mai}
+\medskip
+\item Ukázka výstupu
+\end{itemize}
+
+\begin{quote}
+Retrieving speedtest.net configuration...\\
+Retrieving speedtest.net server list...\\
+Testing from O2 Czech Republic (85.71.xxx.xxx)...\\
+Selecting best server based on latency...\\
+Hosted by Nej TV a.s. (Prague) [3.57 km]: 21.497 ms\\
+Testing download speed\\
+Download: 4.01 Mbit/s\\
+Testing upload speed\\
+Upload: 0.23 Mbit/s\\
+\end{quote}
+
+\end{frame}
+
+
+\begin{frame}{Stav řešení 2/2}
+\begin{itemize}
+\item To samé se všemi debug výpisy má 9233 řádků \\
+	\textit{\url{https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest-debug-all.log}}
+\bigskip
+\item Po odstranění přebytečných informací dostáváme 267 užitečných řádků,
+	které prozradí, jak to celé funguje\\
+	\textit{\url{https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest-debug.log}}
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Ukázka zkráceného výstupu}
+\begin{verbatim}
+build_user_agent: (created) user_agent -> Mozilla/5.0 (Linux; U; 64bit; en-us) Python/2.7.11+ (KHTML, like Gecko) speedtest-cli/0.3.4
+getConfig: downloaded ... parsing
+closestServers: processing url -> ://www.speedtest.net/speedtest-servers-static.php
+closesServers: closest server -> speedtest.vodafone.cz:8080
+getBestServer: test latency for server -> http://speedtest.vodafone.cz/speedtest/latency.txt
+getBestServer: latency -> 27.225
+downloadSpeed: starting producer and consumer for 'q = Queue(6)'
+downloadSpeed:producer: file -> http://rychlost.nejtv.cz/speedtest/random350x350.jpg
+downloadSpeed: threads producer and consumer finished
+uploadSpeed: starting producer and consumer for 'q = Queue(6)'
+uploadSpeed:producer: size -> 250000
+FilePutter.__init__: url -> http://rychlost.nejtv.cz/speedtest/upload.php start -> 1461432707.43 size -> 250000
+uploadSpeed:consumer: len(finished) -> 0
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{Co víme}
+\begin{itemize}
+\item TCP
+\item HTTP
+\item random JPG -- nejdou komprimovat
+\item pevně dané velikosti
+\item 240kB - 30MB na obrázek
+\item multithread
+\item různé implementace
+\item časovač
+\end{itemize}
+
+\begin{figure}[h!]
+	    \centering
+	    \includegraphics[width=1\textwidth]{random350x350.jpg}
+	    \caption{obr}
+	    \label{obr:obr}
+\end{figure}
+
+\end{frame}
+
+
+%\section{Závěr}\label{sec:zaver}
+%\subsection{Shrnutí}\label{sec:zaver1}
+%\subsection{Literatura}\label{sec:zaver2}
+%\subsection{Poděkování}\label{sec:zaver3}
+%\subsection{Otázky}\label{sec:zaver4}
+
+
+
+
+%\begin{frame}{obr}
+ %   \begin{figure}[h!]
+%	    \centering
+%	    \includegraphics[width=0.9\textwidth]{nic.jpg}
+%	    \caption{obr}
+%	    \label{obr:obr}
+ %   \end{figure}
+%\end{frame}
+
+
+\end{document}
