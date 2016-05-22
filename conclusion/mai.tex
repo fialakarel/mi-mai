@@ -1,0 +1,222 @@
+\documentclass[12pt,a4paper]{article}
+%\usepackage{epsf,epic,eepic,eepicemu}
+%\documentstyle[epsf,epic,eepic,eepicemu]{article}
+
+\usepackage[pdftex]{graphicx}
+\usepackage[utf8]{inputenc} %kodovani znaku v textovem souboru
+%\usepackage[T1]{fontenc} %kodovani znaku na vystupu
+\usepackage[czech]{babel} %prizpusobeni jazyku, napr. deleni slov
+%\usepackage{a4wide}
+
+\usepackage[margin=2.5cm]{geometry}
+
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{wrapfig}
+
+\onehalfspacing
+
+
+\begin{document}
+\title{Semestrální projekt MI-MAI\\ 2015/2016\\
+Dokumentace protokolu Speedtest \\
+\vspace{10px}}
+\author{Karel Fiala \\
+\vspace{10px} \\
+\small České vysoké učení technické v~Praze\\
+\small Fakulta informačních technologií\\
+\small Thákurova 9, 160 00 Praha 6\\
+\small Česká republika \\
+\vspace{10px} \\
+}
+\date{\today}
+\maketitle
+\thispagestyle{empty}
+
+% takhle se pise komentar
+
+\clearpage
+\thispagestyle{empty}
+\tableofcontents
+\clearpage
+
+%\begin{abstract}
+%
+%Your abstract goes here...
+%...
+%\end{abstract}
+%\clearpage
+
+
+%\part*{část jedna}						% * zaridi ze to nebude cislovane
+%\addcontentsline{toc}{part}{Úvod}  % toto přidá popisek do obsahu
+%doplnit text
+%\pagebreak
+
+
+\section{Popis protokolu}
+
+\subsection{Obecné}
+
+Protokol speedtest operuje nad TCP (socket či HTTP), měří ping a rychlost oběma směry. Existuje několik implementací, které se od sebe i významně liší. Oficiální implementace využívá technologie Adobe Flash a pro měření využívá zejména TCP streamů. Nejznámější neoficiální implementace je napsaná v programovacím jazyku python a využívá HTTP fallback speedtest serverů. 
+
+
+\subsection{Neoficiální verze -- program speedtest-cli}
+
+Program speedtest-cli je jednoduchý python skript, který využívá speedtest servery a měří vůči nim rychlost klienta pomocí HTTP. Výhodou je jednoduchost řešení, které lze využít třeba i na serverech, kde není možné spustit prohlížeč a Adobe Flash. Kód skriptu je přehledný a dobře dokumentovaný. Nevýhodou může být lehce odlišná implementace měření od \textit{HTTP Legacy Fallback}, které v případě potřeby může využít aplikace v Adobe Flash.
+
+
+\subsection{Oficiální verze -- Adobe Flash}
+
+Verzi v Adobe Flash je uživatelsky přívětivá a snaží se využít TCP socketů. V případě selhání, je stále k dispozici HTTP Legacy Fallback přístup. Naměřené výsledky více reflektují skutečnost i přes vysokou zátěž procesoru způsobenou použitou technologií.
+
+Verze pro HTML5, která již nepotřebuje Adobe Flash je stále ve fázi testování.
+
+
+\subsection{Analýza protokolu}
+
+\subsubsection{Průběh komunikace}
+
+Popis průběhu komunikace pro program speedtest-cli. Oficiální verze přes TCP posílá binární data a také navazuje kontrolní spojení, které má zajistit efektivní využití pásma.
+
+\begin{figure}[h]
+%\begin{wrapfigure}{r}{0.4\textwidth}
+\centering
+\includegraphics[width=0.3\textwidth]{random350x350.jpg}
+\caption{Ukázka stahovaného obrázku random350x350.jpg}
+\label{random350}
+\end{figure}
+
+
+\begin{itemize}
+\item Stáhne se seznam serverů z www.speedtest.net/speedtest-servers-static.php.
+\item Servery se seřadí, vybere se pět nejbližších dle lokace.
+\item Otestuje se latence přes <server>/speedtest/latency.txt.
+\item Začne se testovat rychlost stahování pomocí stahování náhodných jpg obrázků s pevnou velikostí. Každý obrázek se stahuje 4x a stahuje se přes 6 streamů najednou.
+
+Obrázky jsou o velikostech:
+%350x350px , 500x500px, 750x750px, 1000x1000px, 1500x1500px, 2000x2000px, 2500x2500px, 3000x3000px, 3500x3500px a 4000x4000px.
+
+
+\begin{itemize}
+\item 240K random350x350.jpg
+\item 494K random500x500.jpg
+\item 1.1M random750x750.jpg
+\item 1.9M random1000x1000.jpg
+\item 4.3M random1500x1500.jpg
+\item 7.6M random2000x2000.jpg
+\item  12M random2500x2500.jpg
+\item  17M random3000x3000.jpg
+\item  24M random3500x3500.jpg
+\item  31M random4000x4000.jpg
+\end{itemize}
+
+\item Po 10 sec se stahování ukončí a ze stažených dat se spočítá rychlost stahování.
+\item Začne se testovat rychlost nahrávání dat (velká pole čísel) na adresu: <server>/speedtest/upload.php.
+\item Po 10 sec se nahrávání ukončí a z odeslaných dat se spočítá rychlost nahrávání.
+\end{itemize}
+
+Maximálně se tedy stáhne 400MB dat. Stahování trvá maximálně 10sec, po které je linka plně saturována. Bod zlomu je tak 320mbit/s. Pod touto rychlostí bude stahování ukončeno časovačem dříve (přenese se i méně dat) a nad tuto rychlost bude stahování dokončeno dříve než za 10sec (více dat se nepřenese)
+
+
+\section{Naměřené výsledky}
+
+
+\begin{center}
+\begin{tabular}{ | c || c || c | c | c | c |  }
+\hline
+umístění & klient   &  data TX & data RX & rychlost TX & rychlost RX	\\
+\hline
+\hline
+FIT LAN (1gbit) & speedtest-cli & 26MB   & 430MB  & 250mbps   & 850mbps 	\\ \hline
+FIT LAN (1gbit) & web           & 1060MB & 1600MB & 550mbps   & 780mbps 	\\ \hline
+O2 ADSL (5mbit) & speedtest-cli & 2.2MB  & 22MB   & 0.15mbps  & 4.1mbps 	\\ \hline
+O2 ADSL (5mbit) & web           & 1MB    & 9.5MB  & 0.3mbps   & 4.3mbps 	\\ \hline
+
+\end{tabular}
+\end{center}
+
+
+\section{Závěr}
+
+Každá implementace (Adobe Flash, Beta verze v HTML5, speedtest-cli, Android aplikace, iOS aplikace, \ldots) protokolu Speedtest se lehce liší a v každé verzi se mohou objevit různé anomálie dané použitou technologií. Princip a rozhraní poskytované servery však zůstává stejné.
+
+
+\section{Zdroje a odkazy}
+
+\subsection{Vlastní}
+
+\begin{itemize}
+\item \href{https://github.com/fialakarel/speedtest-cli/tree/mi-mai}
+	    {https://github.com/fialakarel/speedtest-cli/tree/mi-mai}
+\item \href{https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest\_cli.py}
+	    {https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest\_cli.py}
+\item \href{https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest-orig.log}
+	    {https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest-orig.log}
+\item \href{https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest-debug.log}
+	    {https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest-debug.log}
+\item \href{https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest-debug-all.log}
+	    {https://github.com/fialakarel/speedtest-cli/blob/mi-mai/speedtest-debug-all.log}
+\item \href{https://github.com/fialakarel/mi-mai/blob/master/presentation-2/random350x350.jpg}
+	    {https://github.com/fialakarel/mi-mai/blob/master/presentation-2/random350x350.jpg}
+\end{itemize}
+
+
+
+\subsection{Externí}
+
+\begin{itemize}
+\item \href{https://support.speedtest.net/hc/en-us/articles/203845400-How-does-the-test-itself-work-How-is-the-result-calculated-}
+	   {https://support.speedtest.net/}
+\item \href{https://en.wikipedia.org/wiki/Speedtest.net}
+	   {https://en.wikipedia.org/}
+\item \href{https://www.ncta.com/platform/broadband-internet/how-do-internet-speed-tests-work-2/}
+	   {https://www.ncta.com/}
+\item \href{http://www.ookla.com/docs/UnderstandingBroadbandMeasurement.pdf}
+	   {http://www.ookla.com/}
+\end{itemize}
+
+
+
+%\begin{itemize}
+%\item seznam
+%\end{itemize}
+
+
+%% tabulka
+%\begin{center}
+%\begin{tabular}{ | c || c | c | c | c | }
+%\hline
+%N    &   čas	\\
+%\hline
+%\hline
+%1000    &   0.20681 	\\ \hline
+%2000    &   0.39094 	\\ \hline
+%3000    &   0.82996 	\\ \hline
+%4000    &   1.27902 	\\ \hline
+%5000    &   2.92957 	\\ \hline
+%6000    &   4.28045 	\\ \hline
+%7000    &   7.42563 	\\ \hline
+%8000    &   8.21492 	\\ \hline
+%\end{tabular}
+%\end{center}
+%
+%
+%% obrázek
+%\pagebreak
+%\begin{figure}[h]
+%\includegraphics[width=\textwidth]{graph/cuda/cuda1.png}
+%\caption{Klasický multiplikativní algoritmus -- CUDA implementace}
+%\label{cuda1}
+%\end{figure}
+
+% generujeme literaturu
+% PRŮCHA, Jan a Soňa KOŤÁTKOVÁ. Předškolní pedagogika: učebnice pro střední a vyšší odborné školy. Vyd. 1. Praha: Portál, 2013, 181 s. ISBN 978-80-262-0495-4.
+%\bibliographystyle{iso690}
+%\bibliography{literatura}
+
+%\appendix
+
+
+\end{document}
