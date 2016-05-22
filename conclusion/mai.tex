@@ -8,7 +8,7 @@
 \usepackage[czech]{babel} %prizpusobeni jazyku, napr. deleni slov
 %\usepackage{a4wide}
 
-\usepackage[margin=2.5cm]{geometry}
+%\usepackage[margin=2.5cm]{geometry}
 
 \usepackage{url}
 \usepackage{hyperref}
@@ -59,19 +59,21 @@ Dokumentace protokolu Speedtest \\
 
 \subsection{Obecné}
 
-Protokol speedtest operuje nad TCP (socket či HTTP), měří ping a rychlost oběma směry. Existuje několik implementací, které se od sebe i významně liší. Oficiální implementace využívá technologie Adobe Flash a pro měření využívá zejména TCP streamů. Nejznámější neoficiální implementace je napsaná v programovacím jazyku python a využívá HTTP fallback speedtest serverů. 
+Protokol Speedtest operuje nad TCP (socket či HTTP), měří ping a rychlost oběma směry. Existuje několik implementací, které se od sebe i významně liší. Oficiální implementace využívá technologie Adobe Flash a pro měření využívá zejména TCP streamů. Nejznámější neoficiální implementace je napsaná v~programovacím jazyku python a využívá HTTP fallback speedtest serverů. 
 
 
 \subsection{Neoficiální verze -- program speedtest-cli}
 
-Program speedtest-cli je jednoduchý python skript, který využívá speedtest servery a měří vůči nim rychlost klienta pomocí HTTP. Výhodou je jednoduchost řešení, které lze využít třeba i na serverech, kde není možné spustit prohlížeč a Adobe Flash. Kód skriptu je přehledný a dobře dokumentovaný. Nevýhodou může být lehce odlišná implementace měření od \textit{HTTP Legacy Fallback}, které v případě potřeby může využít aplikace v Adobe Flash.
+Program speedtest-cli je jednoduchý python skript, který využívá speedtest servery a měří vůči nim rychlost klienta pomocí HTTP. Výhodou je jednoduchost řešení, které lze využít třeba i na serverech, kde není možné spustit prohlížeč a Adobe Flash. Kód skriptu je přehledný a dobře dokumentovaný. Nevýhodou může být lehce odlišná implementace měření od \textit{HTTP Legacy Fallback}, které v~případě potřeby může využít aplikace v~Adobe Flash.
 
 
 \subsection{Oficiální verze -- Adobe Flash}
 
-Verzi v Adobe Flash je uživatelsky přívětivá a snaží se využít TCP socketů. V případě selhání, je stále k dispozici HTTP Legacy Fallback přístup. Naměřené výsledky více reflektují skutečnost i přes vysokou zátěž procesoru způsobenou použitou technologií.
+Verzi v~Adobe Flash je uživatelsky přívětivá a snaží se využít TCP socketů. V~případě selhání, je stále k~dispozici HTTP Legacy Fallback přístup. Naměře-né výsledky více reflektují skutečnost i přes vysokou zátěž procesoru způsobe-nou použitou technologií.
 
-Verze pro HTML5, která již nepotřebuje Adobe Flash je stále ve fázi testování.
+\bigskip 
+
+Verze pro HTML5, která již nepotřebuje Adobe Flash je stále ve fázi testování a na mnoha prohlížečích nefunguje optimálně.
 
 
 \subsection{Analýza protokolu}
@@ -83,19 +85,19 @@ Popis průběhu komunikace pro program speedtest-cli. Oficiální verze přes TC
 \begin{figure}[h]
 %\begin{wrapfigure}{r}{0.4\textwidth}
 \centering
-\includegraphics[width=0.3\textwidth]{random350x350.jpg}
+\includegraphics[width=0.5\textwidth]{random350x350.jpg}
 \caption{Ukázka stahovaného obrázku random350x350.jpg}
 \label{random350}
 \end{figure}
 
 
 \begin{itemize}
-\item Stáhne se seznam serverů z www.speedtest.net/speedtest-servers-static.php.
+\item Stáhne se seznam serverů z~www.speedtest.net/speedtest-servers-static.php.
 \item Servery se seřadí, vybere se pět nejbližších dle lokace.
-\item Otestuje se latence přes <server>/speedtest/latency.txt.
-\item Začne se testovat rychlost stahování pomocí stahování náhodných jpg obrázků s pevnou velikostí. Každý obrázek se stahuje 4x a stahuje se přes 6 streamů najednou.
+\item Otestuje se latence přes $<server>$/speedtest/latency.txt.
+\item Začne se testovat rychlost stahování pomocí stahování náhodných jpg obrázků s~pevnou velikostí. Každý obrázek se stahuje 4x a stahuje se přes 6 streamů najednou.
 
-Obrázky jsou o velikostech:
+Obrázky jsou o~velikostech:
 %350x350px , 500x500px, 750x750px, 1000x1000px, 1500x1500px, 2000x2000px, 2500x2500px, 3000x3000px, 3500x3500px a 4000x4000px.
 
 
@@ -113,35 +115,109 @@ Obrázky jsou o velikostech:
 \end{itemize}
 
 \item Po 10 sec se stahování ukončí a ze stažených dat se spočítá rychlost stahování.
-\item Začne se testovat rychlost nahrávání dat (velká pole čísel) na adresu: <server>/speedtest/upload.php.
-\item Po 10 sec se nahrávání ukončí a z odeslaných dat se spočítá rychlost nahrávání.
+\item Začne se testovat rychlost nahrávání dat (velká pole čísel) na adresu: $<server>$/speedtest/upload.php.
+\item Po 10 sec se nahrávání ukončí a z~odeslaných dat se spočítá rychlost nahrávání.
 \end{itemize}
 
-Maximálně se tedy stáhne 400MB dat. Stahování trvá maximálně 10sec, po které je linka plně saturována. Bod zlomu je tak 320mbit/s. Pod touto rychlostí bude stahování ukončeno časovačem dříve (přenese se i méně dat) a nad tuto rychlost bude stahování dokončeno dříve než za 10sec (více dat se nepřenese)
+Maximálně se tedy stáhne cca 400MB dat + režie. Stahování trvá maximálně 10sec, po které je linka plně saturována. Bod zlomu je tak 320mbit/s. Pod touto rychlostí bude stahování ukončeno časovačem dříve (přenese se i méně dat) a nad tuto rychlost bude stahování dokončeno dříve než za 10sec (více dat se nepřenese)
 
 
 \section{Naměřené výsledky}
 
+\subsection{speedtest-cli}
+
+\subsubsection{RX}
 
 \begin{center}
-\begin{tabular}{ | c || c || c | c | c | c |  }
+\begin{tabular}{ | c || c | c | c | }
 \hline
-umístění & klient   &  data TX & data RX & rychlost TX & rychlost RX	\\
+umístění &  data RX & rychlost RX & d/r \\
 \hline
 \hline
-FIT LAN (1gbit) & speedtest-cli & 26MB   & 430MB  & 250mbps   & 850mbps 	\\ \hline
-FIT LAN (1gbit) & web           & 1060MB & 1600MB & 550mbps   & 780mbps 	\\ \hline
-O2 ADSL (5mbit) & speedtest-cli & 2.2MB  & 22MB   & 0.15mbps  & 4.1mbps 	\\ \hline
-O2 ADSL (5mbit) & web           & 1MB    & 9.5MB  & 0.3mbps   & 4.3mbps 	\\ \hline
+FIT LAN (1gbps)      & 430MB  & 850mbps & 0.5	\\ \hline
+Eurosignal (100mbps) & 196MB  & 85mbps  & 2.3	\\ \hline
+Eurosignal (100mbps) & 122MB  & 50mbps  & 2.4	\\ \hline
+O2 ADSL (5/1mbps)    & 22MB   & 4.1mbps & 5.36	\\ \hline
+
+\end{tabular}
+\end{center}
+
+\subsubsection{TX}
+
+\begin{center}
+\begin{tabular}{ | c || c | c | c | }
+\hline
+umístění &  data TX & rychlost TX & d/r	\\
+\hline
+\hline
+FIT LAN (1gbps)      & 26MB   & 250mbps  & 0.1	 \\ \hline
+Eurosignal (100mbps) & 22.8MB & 88mbps   & 0.25	 \\ \hline
+Eurosignal (100mbps) & 21.5MB & 80mbps   & 0.26	 \\ \hline
+O2 ADSL (5/1mbps)    & 2.2MB  & 0.15mbps & 14.6	 \\ \hline
 
 \end{tabular}
 \end{center}
 
 
+\bigskip
+
+
+\subsection{Adobe Flash}
+
+\subsubsection{RX}
+
+\begin{center}
+\begin{tabular}{ | c || c | c | c | }
+\hline
+umístění &  data RX & rychlost RX & d/r \\
+\hline
+\hline
+FIT LAN (1gbps)      & 1600MB & 780mbps & 2.0 	\\ \hline
+WiFi (25/5mbps)      & 24MB   & 7mbps   & 3.4	\\ \hline
+O2 ADSL (5/1mbps)    & 9.5MB  & 4.3mbps & 2.2	\\ \hline
+
+\end{tabular}
+\end{center}
+
+\subsubsection{TX}
+
+\begin{center}
+\begin{tabular}{ | c || c | c | c | }
+\hline
+umístění &  data TX & rychlost TX & d/r	\\
+\hline
+\hline
+FIT LAN (1gbps)      & 1060MB & 550mbps & 1.9	  \\ \hline
+WiFi (25/5mbps)      & 8MB    & 4mbps   & 2.0	  \\ \hline
+O2 ADSL (5/1mbps)    & 1MB    & 0.3mbps & 3.3	  \\ \hline
+
+\end{tabular}
+\end{center}
+
+
+\bigskip
+
+Oficiální aplikace v~Adobe Flash má tendenci pomalá připojení měřit déle než rychlá připojení, kde se přenese mnohem více dat.
+
+\pagebreak
+
 \section{Závěr}
 
-Každá implementace (Adobe Flash, Beta verze v HTML5, speedtest-cli, Android aplikace, iOS aplikace, \ldots) protokolu Speedtest se lehce liší a v každé verzi se mohou objevit různé anomálie dané použitou technologií. Princip a rozhraní poskytované servery však zůstává stejné.
+Každá implementace (Adobe Flash, Beta verze v~HTML5, speedtest-cli, Android aplikace, iOS aplikace, \ldots) protokolu Speedtest se lehce liší a v~každé verzi se mohou objevit různé anomálie dané použitou technologií. Dle dohledaných informacích se právě metodika testování mobilních připojení pomocí mobilních aplikací často mění a je snaha ji datově optimalizovat. Princip a rozhraní poskytované servery však zůstává stejné.
 
+\medskip
+
+Dle mého názoru lze naměřené hodnoty brát pouze jako orientační. Liší se v~různých implementacích a v~různých verzích každé implementace. Množství přenesených dat se dá v~ideálním případě vyjádřit jako (rychlost linky)*(doba měření). Kratší doba měření bude z~mnoha důvodů zkreslovat výsledek (aktu-ální provoz sítě, zarušení, \uv{burst} nastavení v~traffic shaperu poskytovatele, \ldots). Delší doba naopak výrazně zvyšuje množství přenesených dat. Obvyklá doba měření je cca 10-20~sekund. Tedy 80~mbps linka přenese za 10~sec cca 100~MB dat.
+
+\medskip
+
+Pokud je množství přenesených dat výrazně nižší než vztah výše, tak nemohlo dojít k~saturaci linky (např. nedostatek zdrojů klienta či prvků na trase, úzké hrdlo v~síti, \ldots) a změřená rychlost neodpovídá.  
+
+\medskip
+
+Nemělo by se stát že množství přenesených dat je výrazně vyšší než vztah výše. Avšak existují možnosti limitování rychlosti, které dovolí klientovi krátkodobě překročit povolenou rychlost. Důvod je prostý -- využít linku, rychle klienta odbavit, dát klientovi pocit rychlého připojení, \ldots.  
+
+\pagebreak
 
 \section{Zdroje a odkazy}
 
@@ -175,6 +251,8 @@ Každá implementace (Adobe Flash, Beta verze v HTML5, speedtest-cli, Android ap
 	   {https://www.ncta.com/}
 \item \href{http://www.ookla.com/docs/UnderstandingBroadbandMeasurement.pdf}
 	   {http://www.ookla.com/}
+\item \href{http://vodafone.intelliresponse.com/index.jsp?id=1521&question=Speed+tests+and+data+usage&requestType=NormalRequest&source=100}
+	   {http://vodafone.intelliresponse.com/}
 \end{itemize}
 
 
